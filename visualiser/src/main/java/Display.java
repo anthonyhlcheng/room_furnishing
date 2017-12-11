@@ -5,12 +5,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
     public class Display extends JFrame {
-        public Display() {
-            initUI();
+        public Display(String room) {
+            initUI(room);
         }
 
-        private void initUI() {
-            add(new Room());
+        private void initUI(String room) {
+            add(new Room(room));
             setTitle("Visualiser");
             setSize(1280, 720);
             setLocationRelativeTo(null);
@@ -23,7 +23,10 @@ import javax.swing.JPanel;
 
                 @Override
                 public void run() {
-                    Display ex = new Display();
+                    //String filename = "1.txt";
+                    //ReadFile read = new ReadFile(filename);
+                    //Display ex = new Display(read.getRoom());
+                    Display ex = new Display("(0,0), (10,0), (10,10), (0,10)");
                     ex.setVisible(true);
                 }
             });
