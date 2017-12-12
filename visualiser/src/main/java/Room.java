@@ -1,5 +1,3 @@
-
-
 import javafx.util.Pair;
 
 import javax.swing.*;
@@ -69,15 +67,6 @@ class Room extends JPanel {
 
     public ArrayList<Pair<Double, Double>> getCoordinates() {
         return coordinates;
-    }
-
-    public ArrayList<Float> getWeightages(ArrayList<String> shapesNotInRoom) {
-        ArrayList<Float> weightage = null;
-        for(String shape : shapesNotInRoom) {
-            String[] splitted = shape.split(":");
-            weightage.add(Float.parseFloat(splitted[0]));
-        }
-        return weightage;
     }
 
     @Override
