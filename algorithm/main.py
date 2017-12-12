@@ -6,11 +6,11 @@ import sys
 
 def start(input_file, output_file):
     with open(output_file, "w") as output:
-        output.write("zaragoza")
-        output.write("t2ri0va94ush0tdu9gpuusq64r")
+        output.write("zaragoza\n")
+        output.write("t2ri0va94ush0tdu9gpuusq64r\n")
         counter = 1
         for problem in parser.main(input_file):
-            output.write("{}: {}".format(counter, algorithm.solve_problem(problem)))
+            output.write("{}: {}\n".format(counter, algorithm.solve_problem(problem)))
             counter += 1
 
 if __name__ == "__main__":

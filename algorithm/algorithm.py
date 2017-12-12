@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-PLOT_EACH_PROBLEM = True
+PLOT_EACH_PROBLEM = False
 
 import math
 from shapely.geometry import Polygon
