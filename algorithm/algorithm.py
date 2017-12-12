@@ -1,55 +1,69 @@
 #!/usr/bin/python3
 
-PLOT_EACH_PROBLEM = False
-
 import math
+import os
 from shapely.geometry import Polygon
-
 from matplotlib import pyplot
 
+PLOT_EACH_PROBLEM = False
+SAVE_PROBLEM = True
+VISUALISATION_FOLDER = os.path.join(os.path.dirname(__file__), "../output_visualisations_{}/")
+VISUALISATION_FILENAME = "{}.jpg"
+
 # Parameters:
+#   counter: integer
+#   version: integer
 #   problem: (room, furniture)
 #       where room: [coordinates]
 #             furniture: [(cost, [coordinates])]
 #             cost: integer
 #             coordinates: (double, double)
 # Returns string
-def solve_problem(problem):
-    return format_answer(solve(problem[0], problem[1]))
+def solve_problem(counter, version, problem):
+    return format_answer(solve(counter, version, problem[0], problem[1]))
 
 # Parameters:
+#   count: integer
+#   version: integer
 #   room: [coordinates]
 #   furniture: [(cost, [coordinates])]
 #       where cost: integer
 #             coordinates: (double, double)
 # Returns [[coordinates]]
-def solve(room, furniture):
+def solve(count, version, room, furniture):
     furniture.sort(key=lambda x: x[0], reverse=True)
     furniture_in_room = []
+    furniture_in_room_polygons = []
+    room_polygon = Polygon(room)
+    counter = 1
     for f in furniture:
-        coords = fits_in_room(room, furniture_in_room, f[1])
+        print("Problem {}, {}/{}".format(count, counter, len(furniture)), end="\r")
+        coords = fits_in_room(room, room_polygon, furniture_in_room_polygons, f[1])
         if coords:
             furniture_in_room.append(coords)
-    if PLOT_EACH_PROBLEM:
-        plot([Polygon(room)] + [Polygon(f) for f in furniture_in_room])
+            furniture_in_room_polygons.append(Polygon(coords))
+        counter += 1
+    if PLOT_EACH_PROBLEM or SAVE_PROBLEM:
+        plot(count, version, room, [room_polygon] + furniture_in_room_polygons)
     return furniture_in_room
 
 # Parameters:
 #   room: [coordinates]
-#   furniture_in_room: [[coordinates]]
+#   room_polygon: Polygon
+#   furniture_in_room_polygons: [Polygon]
 #   f: [coordinates]
 # Returns None or [coordinates]
-def fits_in_room(room, furniture_in_room, f):
+def fits_in_room(room, room_polygon, furniture_in_room_polygons, f):
     xs, ys = zip(*room)
     for i in transformations(f, min(xs), max(xs), min(ys), max(ys)):
         for j in rotations(i):
-            if check_with_coords(room, furniture_in_room, j):
+            if check_with_coords(room_polygon, furniture_in_room_polygons, j):
                 return j
     return None
 
 # Parameters:
-#   room: [coordinates]
-#   furniture_in_room: [[coordinates]]
+#   room: Polygon
+#   furniture_in_room: [Polygon]
 #   f: [coordinates]
 # Returns True or False
 def check_with_coords(room, furniture_in_room, f):
@@ -61,13 +75,11 @@ def check_with_coords(room, furniture_in_room, f):
     return False
 
 # Parameters:
-#   room: [coordinates]
+#   room: Polygon
 #   f: [coordinates]
 # Returns True or False
 def is_inside(room, f):
-    room_polygon = Polygon(room)
-    furniture_polygon = Polygon(f)
-    return furniture_polygon.within(room_polygon)
+    return Polygon(f).within(room)
 
 # Parameters:
 #   f: [coordinates]
@@ -94,29 +106,35 @@ def rotations(f):
         theta += step
 
 # Parameters:
-#   room_furniture: [coordinates]
+#   room_furniture: Polygon
 #   furniture: [coordinates]
 # Returns True or False
 def no_overlap(room_furniture, furniture):
-    furniture_one = Polygon(room_furniture)
-    furniture_two = Polygon(furniture)
-    return not furniture_one.intersects(furniture_two)
+    furniture = Polygon(furniture)
+    return not room_furniture.intersects(furniture)
 
-def plot(polygons):
+def plot(count, version, room, polygons):
     fig = pyplot.figure(1, figsize=(5,5), dpi=90)
     ax = fig.add_subplot(111)
     for i in polygons:
         x,y = i.exterior.xy
         ax.plot(x, y)
     ax.set_title('Comparison of Ploygons')
-    x_range = [-5, 15]
-    y_range = [-5, 15]
+    xs, ys = zip(*room)
+    x_range = [int(min(xs))- 1, int(max(xs)) + 1]
+    y_range = [int(min(ys)) - 1, int(max(ys)) + 1]
     ax.set_xlim(*x_range)
     ax.set_xticks(list(range(*x_range)) + [x_range[-1]])
     ax.set_ylim(*y_range)
     ax.set_yticks(list(range(*y_range)) + [y_range[-1]])
     ax.set_aspect(1)
-    pyplot.show()
+    if PLOT_EACH_PROBLEM:
+        pyplot.show()
+    if SAVE_PROBLEM:
+        if not os.path.exists(VISUALISATION_FOLDER.format(version)):
+                os.makedirs(VISUALISATION_FOLDER.format(version))
+        pyplot.savefig(VISUALISATION_FOLDER.format(version) + VISUALISATION_FILENAME.format(count), bbox_inches="tight")
+    pyplot.close()
 
 def format_answer(furniture):
     result = ""
@@ -124,57 +142,3 @@ def format_answer(furniture):
         result += ", ".join(["({}, {})".format(x, y) for x,y in f])
         result += "; "
     return result[:-2]
-
-'''
-# Scales 2D array for increased fidelity
-multiplier = 10
-
-
-def solve(problem):
-    furniture_list = [furniture(i[0], i[1]) for i in problem[1]]
-    room = convert_to_room_array(problem[0])
-    # TODO sort furniture_list
-    furniture_in_room = []
-    for f in furniture_list:
-        if drop_furniture_into_room(room, furniture, furniture_in_room):
-            furniture_in_room.append(f)
-    # TODO return result
-
-def convert_to_room_array(room_list):
-    xs, ys = zip(*room_list)
-    room_size = (max(xs) - min(xs), max(ys) - min(ys))
-    return [[0 for j in range(multiplier * room_size[1])] for i in range(multiplier * room_size[0])]
-
-def drop_furniture_into_room(room, furniture, furniture_in_room):
-    
-
-def try_translations(room, furniture_in_room, furniture):
-    
-
-def check_if_fits(room, furniture_in_room, furniture):
-    # Check border box is in room
-    if furniture.border_box 
-
-def format_answer(result):
-    # TODO
-    
-class furniture:
-    def __init__(self, cost, verticies):
-        self.cost = cost
-        self.verticies = verticies
-        calculate_border()
-        calculate_area()
-        calculate_final_cost()
-        self.in_room = False
-        
-    def calculate_border(self):
-        xs, ys = zip(*self.verticies)
-        self.border_box = [(min(xs), min(ys)), (max(xs), min(ys)), (max(xs), max(ys)), (min(xs), max(ys))]
-
-    def calculate_area(self):
-        xs, ys = zip(*self.verticies)
-        self.area = abs(0.5 * sum([(xs[i] * ys[i+1]) - (ys[i] * xs[i+1]) for i in range(len(self.verrticies)-1)] + [(xs[0] * ys[-1]) - (ys[0] * xs[-1])]))
-
-    def calculate_final_cost(self):
-        self.final_cost = self.area * self.cost
-'''
