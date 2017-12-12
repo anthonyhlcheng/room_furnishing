@@ -2,6 +2,7 @@
 
 import parser
 import algorithm
+import time
 import sys
 
 def start(input_file, output_file):
@@ -10,11 +11,14 @@ def start(input_file, output_file):
         output.write("t2ri0va94ush0tdu9gpuusq64r\n")
         counter = 1
         for problem in parser.main(input_file):
+            start_time = time.time()
+            print("Problem {}".format(counter), end="")
+            sys.stdout.flush()
             output.write("{}: {}\n".format(counter, algorithm.solve_problem(problem)))
+            print(" - {} seconds".format(round(time.time() - start_time, 2)))
             counter += 1
 
 if __name__ == "__main__":
-    start(sys.argv[1], sys.argv[2])
     try:
         start(sys.argv[1], sys.argv[2])
     except Exception as e:
