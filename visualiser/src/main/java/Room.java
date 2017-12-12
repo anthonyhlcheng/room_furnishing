@@ -71,6 +71,15 @@ class Room extends JPanel {
         return coordinates;
     }
 
+    public ArrayList<Float> getWeightages(ArrayList<String> shapesNotInRoom) {
+        ArrayList<Float> weightage = null;
+        for(String shape : shapesNotInRoom) {
+            String[] splitted = shape.split(":");
+            weightage.add(Float.parseFloat(splitted[0]));
+        }
+        return weightage;
+    }
+
     @Override
     public void paintComponent(Graphics g) {
 
