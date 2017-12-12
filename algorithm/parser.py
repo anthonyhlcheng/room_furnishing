@@ -2,7 +2,7 @@
 
 import sys
 
-# Returns list:
+# Returns:
 # (room, furniture)
 #   room: [(double,double)] // list of coordinates
 #   furniture: [(int, [(double, double)]]
@@ -13,16 +13,16 @@ def divide_problem(problem):
     furniture = [(int(i.strip().split(":")[0]), [tuple(map(float, j.replace(" ", "").strip("()").split(","))) for j in i.strip().split(":")[1].split("),")]) for i in problem.split("#")[1].split(";")]
     return (room, furniture)
 
+# Returns list:
+# [(room, temperature)]
 def main(input_file):
-    problems = []
     with open(input_file, "r") as input_file:
         for line in input_file:
-            problems.append(divide_problem(line))
-    return problems
+            yield divide_problem(line)
 
 if __name__ == "__main__":
     try:
-        main(sys.argv[1])
+        print(list(main(sys.argv[1])))
     except Exception as e:
         print(e)
         print("Usage: {} [filename]".format(sys.argv[0]))
