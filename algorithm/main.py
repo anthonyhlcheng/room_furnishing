@@ -33,7 +33,6 @@ def start(input_file, output_file, version):
             counter += 1
 
 if __name__ == "__main__":
-    start(sys.argv[1], sys.argv[2].format(sys.argv[3]), sys.argv[3])
     try:
         start(sys.argv[1], sys.argv[2].format(sys.argv[3]), sys.argv[3])
     except Exception as e:
