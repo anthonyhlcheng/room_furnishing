@@ -12,4 +12,4 @@ The Room Furnishing Problem
 ### To run algorithm on Linux
 `./algorithm/main.py problems.rfp outputs/output_{}.txt` [Version Number]
 
-*Output will then be stored in the file __ouputs/output_[Version Number].txt__*
+*Output will then be stored in the file __ouputs/output\_[Version Number].txt__*
