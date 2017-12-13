@@ -18,7 +18,11 @@ def start(input_file, output_file, version):
             print("Problem {}".format(counter), end="\r")
             sys.stdout.flush()
             with open(output_file, "a") as output:
-                output.write("{}: {}\n".format(counter, algorithm.solve_problem(counter, version, problem)))
+                resulting_string = algorithm.solve_problem(counter, version, problem)
+                if not resulting_string.replace(" ", ""):
+                    print("Problem {} not completed due to no result found".format(counter))
+                    continue
+                output.write("{}: {}\n".format(counter, resulting_string))
             problem_coverage_results = coverage_calculator.go(input_file, output_file, counter)
             result = "32mPASSED" if problem_coverage_results[0] >= 30 else "31mFAILED"
             print("\033[{}\033[0m Problem {}: Coverage: {}%, Score: {} - {} seconds".format(result, counter, problem_coverage_results[0], problem_coverage_results[1], round(time.time() - start_time, 2)))
@@ -29,6 +33,7 @@ def start(input_file, output_file, version):
             counter += 1
 
 if __name__ == "__main__":
+    start(sys.argv[1], sys.argv[2].format(sys.argv[3]), sys.argv[3])
     try:
         start(sys.argv[1], sys.argv[2].format(sys.argv[3]), sys.argv[3])
     except Exception as e:

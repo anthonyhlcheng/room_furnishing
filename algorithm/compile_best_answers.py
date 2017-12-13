@@ -28,13 +28,16 @@ def write_best_answers():
                 output.write(best_results[str(i)][1])
 
 def show_status():
+    passed = 0
     for i in range(1, 31):
         result = coverage_calculator.go(problems_file, output_file, i)
         status = "32mPASSED" if result and result[0] >= 30 else "31mFAILED"
         if result:
+            passed += 1
             print("\033[{}\033[0m Problem {} - Coverage: {}%, Score: {}".format(status, i, result[0], result[1]))
         else:
             print("\033[{}\033[0m Problem {} - No result".format(status, i))
+    print("Number of passed problems: {}".format(passed))
 
 if __name__ == "__main__":
     write_best_answers()
