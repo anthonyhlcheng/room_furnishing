@@ -31,7 +31,7 @@ def solve_problem(counter, version, problem):
 #             coordinates: (double, double)
 # Returns [[coordinates]]
 def solve(count, version, room, furniture):
-    furniture.sort(key=lambda x: x[0], reverse=True)
+    furniture.sort(key=lambda x: x[0] * Polygon(x[1]).area, reverse=True)
     furniture_in_room = []
     furniture_in_room_polygons = []
     room_polygon = Polygon(room)
@@ -87,10 +87,14 @@ def is_inside(room, f):
 #   max_y: double
 # Returns [coordinates]
 def transformations(f, min_x, max_x, min_y, max_y):
-    step = 1
-    for i in range(int(min_x), int(max_x) + 1, step):
-        for j in range(int(min_y), int(max_y), step):
+    step = 0.5
+    i = min_x
+    while i < max_x:
+        j = min_y
+        while j < max_y:
             yield [(x + i, y + i) for x,y in f]
+            j += step
+        i += step
 
 # Parameters:
 #   f: [coordinates]
