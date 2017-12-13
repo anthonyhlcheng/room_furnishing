@@ -42,7 +42,7 @@ def solve(count, version, room, furniture):
         print("Problem {}, {}/{}".format(count, counter, len(furniture)), end="\r")
         coords = fits_in_room(room_polygon, furniture_in_room_polygons, Polygon(f[1]))
         if coords:
-            furniture_in_room.append(list(zip(*coords)))
+            furniture_in_room.append(list(zip(*coords.exterior.xy)))
             furniture_in_room_polygons.append(coords)
         counter += 1
     if PLOT_EACH_PROBLEM or SAVE_PROBLEM:
@@ -56,7 +56,7 @@ def solve(count, version, room, furniture):
 # Returns None or Polygon
 def fits_in_room(room_polygon, furniture_in_room_polygons, f):
     for i in transformations(f, room_polygon.bounds[0], room_polygon.bounds[2], room_polygon.bounds[1], room_polygon.bounds[3], room_polygon):
-        for j in rotations(i):
+        for j in rotations(i[0], i[1]):
             if check_with_coords(room_polygon, furniture_in_room_polygons, j):
                 return j
     return None
@@ -90,8 +90,8 @@ def is_inside(room, f):
 #   room_polygon: Polygon
 # Returns Polygon
 def transformations(f, min_x, max_x, min_y, max_y, room_polygon):
-    for i in list(zip(*room_polygon).exterior.coords.xy):
-        for j in list(zip(*f).exterior.coords.xy):
+    for i in list(zip(*room_polygon.exterior.coords.xy)):
+        for j in list(zip(*f.exterior.coords.xy)):
             yield (transform(lambda x,y: (x + i[0] - j[0], y + i[1] - j[1]), f), i)
 
     largest = max_x - min_x if max_x - min_x >= max_y - min_y else max_y - min_y
@@ -118,7 +118,7 @@ def rotations(f, rotation_point):
         theta = 0
         step_in_degrees = 0.1
         end = 2 * math.pi
-        a,b = f[0]
+        a,b = list(zip(*f.exterior.coords.xy))[0]
         while theta < end:
             yield rotate(f, theta, i)
             theta += step_in_degrees
