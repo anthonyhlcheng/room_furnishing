@@ -17,8 +17,9 @@ def write_best_answers():
         for i in range(1, 31):
             result = coverage_calculator.go_with_string(problems_file, directory_path + answer_file, i)
             if result:
-                if result[0] >= 30 and (str(i) not in best_results or resulting_score > best_result[i][0]):
-                    best_results[str(i)] = result[2]
+                if result[0] >= 30:
+                    if str(i) not in best_results or result[1] > best_results[str(i)][0]:
+                        best_results[str(i)] = (result[1], result[2])
     with open(output_file, "w") as output:
         output.write("zaragoza\n")
         output.write("t2ri0va94ush0tdu9gpuusq64r\n")
@@ -26,7 +27,16 @@ def write_best_answers():
             if str(i) in best_results:
                 output.write(best_results[str(i)][1])
 
+def show_status():
+    for i in range(1, 31):
+        result = coverage_calculator.go(problems_file, output_file, i)
+        status = "32mPASSED" if result and result[0] >= 30 else "31mFAILED"
+        if result:
+            print("\033[{}\033[0m Problem {} - Coverage: {}%, Score: {}".format(status, i, result[0], result[1]))
+        else:
+            print("\033[{}\033[0m Problem {} - No result".format(status, i))
 
 if __name__ == "__main__":
     write_best_answers()
     print("Done. Output to file {}".format(output_file))
+    show_status()
