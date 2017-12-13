@@ -2,8 +2,8 @@
 The Room Furnishing Problem 
 
 ## Versions
-- Version 0 - Initial algorithm
-- Version 1 - Initial algorithm with efficiency improvements
+- __Version 0__ - Initial algorithm *[Incomplete]*
+- __Version 1__ - Initial algorithm with efficiency improvements *[Problems 1-10]*
 
 ### Requirements for algorithm
 - Shapely (https://shapely.readthedocs.io/en/latest/project.html#requirements)

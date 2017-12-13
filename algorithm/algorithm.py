@@ -7,7 +7,7 @@ from matplotlib import pyplot
 
 PLOT_EACH_PROBLEM = False
 SAVE_PROBLEM = True
-VISUALISATION_FOLDER = os.path.join(os.path.dirname(__file__), "../output_visualisations_{}/")
+VISUALISATION_FOLDER = os.path.join(os.path.dirname(__file__), "../outputs/output_visualisations_{}/")
 VISUALISATION_FILENAME = "{}.jpg"
 
 # Parameters:
@@ -119,7 +119,7 @@ def plot(count, version, room, polygons):
     for i in polygons:
         x,y = i.exterior.xy
         ax.plot(x, y)
-    ax.set_title('Comparison of Ploygons')
+    ax.set_title("Version {}, Problem {}".format(version, count))
     xs, ys = zip(*room)
     x_range = [int(min(xs))- 1, int(max(xs)) + 1]
     y_range = [int(min(ys)) - 1, int(max(ys)) + 1]
