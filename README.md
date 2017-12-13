@@ -10,6 +10,6 @@ The Room Furnishing Problem
 - Matplotlib (https://matplotlib.org/users/installing.html)
 
 ### To run algorithm on Linux
-`./algorithm/main.py problems.rfp outputs/output_{}.txt` [Version Number]
+`./algorithm/main.py problems.rfp outputs/output_{}.txt [Version Number]`
 
 *Output will then be stored in the file __ouputs/output\_[Version Number].txt__*
