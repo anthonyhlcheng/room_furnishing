@@ -12,6 +12,10 @@ SAVE_PROBLEM = True
 VISUALISATION_FOLDER = os.path.join(os.path.dirname(__file__), "../outputs/output_visualisations_{}/")
 VISUALISATION_FILENAME = "{}.jpg"
 
+USE_SNAPPING_TECHNIQUE = True
+STEP_MULTIPLIER_PERCENTAGE = 5
+USE_SCAN_TECHNIQUE = True
+
 # Parameters:
 #   counter: integer
 #   version: integer
@@ -40,26 +44,44 @@ def solve(count, version, room, furniture):
     counter = 1
     for f in furniture:
         print("Problem {}, {}/{}".format(count, counter, len(furniture)), end="\r")
-        coords = fits_in_room(room_polygon, furniture_in_room_polygons, Polygon(f[1]))
+        if type(room_polygon) is Polygon:
+            room_polygon,coords = fits_in_room(room_polygon, furniture_in_room_polygons, Polygon(f[1]))
+        else:
+            for i in room_polygon:
+                result = fits_in_room(i, furniture_in_room_polygons, Polygon(f[1]))
+                if result[1]:
+                    room_polygon,coords = result
+                    break
         if coords:
             furniture_in_room.append(list(zip(*coords.exterior.xy)))
             furniture_in_room_polygons.append(coords)
         counter += 1
     if PLOT_EACH_PROBLEM or SAVE_PROBLEM:
-        plot(count, version, room, [room_polygon] + furniture_in_room_polygons)
+        plot(count, version, room, [Polygon(room)] + furniture_in_room_polygons)
     return furniture_in_room
 
 # Parameters:
 #   room_polygon: Polygon
 #   furniture_in_room_polygons: [Polygon]
 #   f: Polygon
-# Returns None or Polygon
+# Returns:
+#   (Polygon, None) or (Polygon, Polygon)
 def fits_in_room(room_polygon, furniture_in_room_polygons, f):
+    if f.area > room_polygon.area:
+        return (room_polygon, None)
     for i in transformations(f, room_polygon.bounds[0], room_polygon.bounds[2], room_polygon.bounds[1], room_polygon.bounds[3], room_polygon):
         for j in rotations(i[0], i[1]):
             if check_with_coords(room_polygon, furniture_in_room_polygons, j):
-                return j
-    return None
+                return (new_room_polygon(room_polygon, j), j)
+    return (room_polygon, None)
+
+# Parameters:
+#   room_polygon: Polygon
+#   f: Polygon
+# Returns:
+#   Polygon
+def new_room_polygon(room_polygon, f):
+    return room_polygon.difference(f)
 
 # Parameters:
 #   room: Polygon
@@ -90,19 +112,21 @@ def is_inside(room, f):
 #   room_polygon: Polygon
 # Returns Polygon
 def transformations(f, min_x, max_x, min_y, max_y, room_polygon):
-    for i in list(zip(*room_polygon.exterior.coords.xy)):
-        for j in list(zip(*f.exterior.coords.xy)):
-            yield (transform(lambda x,y: (x + i[0] - j[0], y + i[1] - j[1]), f), i)
-
-    largest = max_x - min_x if max_x - min_x >= max_y - min_y else max_y - min_y
-    step = 0.05 * largest
-    i = min_x
-    while i < max_x:
-        j = min_y
-        while j < max_y:
-            yield (transform(lambda x,y: (x + i, y + i), f), None)
-            j += step
-        i += step
+    if USE_SNAPPING_TECHNIQUE:
+        for i in list(zip(*room_polygon.exterior.coords.xy)):
+            for j in list(zip(*f.exterior.coords.xy)):
+                yield (transform(lambda x,y: (x + i[0] - j[0], y + i[1] - j[1]), f), i)
+    
+    if USE_SCAN_TECHNIQUE:
+        largest = max_x - min_x if max_x - min_x >= max_y - min_y else max_y - min_y
+        step = 0.01 * STEP_MULTIPLIER_PERCENTAGE * largest
+        i = min_x
+        while i < max_x:
+            j = min_y
+            while j < max_y:
+                yield (transform(lambda x,y: (x + i, y + i), f), None)
+                j += step
+            i += step
 
 # Parameters:
 #   f: Polygon

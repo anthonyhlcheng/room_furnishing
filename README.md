@@ -18,6 +18,9 @@ The Room Furnishing Problem
 - __Version 2__ - With smaller transformation steps (0.1) *[Problems 1-9]*
 - __Version 4__ - Change to cost queue *[Problems 1-9]*
 - __Version 5__ - Running problems 24 onwards
-- __Version 6__ - Made transformation step relative to room size
 - __Version 7__ - Fixed rotations and made step now 5% of room size
 - __Version 8__ - With new snapping feature
+- __Version 3__ - With transformation steps of 0.5
+- __Version 6__ - Made transformation step relative to room size
+- __Version 9__ - With no snapping, and step muliplier on 3%
+- __Version 10__ - With snapping and step multiplier on 5%
