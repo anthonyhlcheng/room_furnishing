@@ -2,6 +2,7 @@
 
 import parser
 import algorithm
+import coverage_calculator
 import time
 import sys
 
@@ -17,7 +18,9 @@ def start(input_file, output_file, version):
         sys.stdout.flush()
         with open(output_file, "a") as output:
             output.write("{}: {}\n".format(counter, algorithm.solve_problem(counter, version, problem)))
-        print("Problem {} - {} seconds".format(counter, round(time.time() - start_time, 2)))
+        problem_coverage_results = coverage_calculator.go(input_file, output_file, counter)
+        result = "32mPASSED" if problem_coverage_results[0] >= 30 else "31mFAILED"
+        print("\033[{}\033[0m Problem {}: Coverage: {}%, Score: {} - {} seconds".format(result, counter, problem_coverage_results[0], problem_coverage_results[1], round(time.time() - start_time, 2)))
         counter += 1
 
 if __name__ == "__main__":
@@ -25,4 +28,4 @@ if __name__ == "__main__":
         start(sys.argv[1], sys.argv[2].format(sys.argv[3]), sys.argv[3])
     except Exception as e:
         print(e)
-        print("Usage: {} [input filename] [output filename with {} inside] [version number]".format(sys.argv[0]))
+        print("Usage: {} [input filename] [output filename with {} inside] [version number]".format(sys.argv[0], "{}"))
