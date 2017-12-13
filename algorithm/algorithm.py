@@ -38,7 +38,7 @@ def solve(count, version, room, furniture):
     counter = 1
     for f in furniture:
         print("Problem {}, {}/{}".format(count, counter, len(furniture)), end="\r")
-        coords = fits_in_room(room, room_polygon, furniture_in_room_polygons, f[1])
+        coords = fits_in_room(room_polygon, furniture_in_room_polygons, f[1])
         if coords:
             furniture_in_room.append(coords)
             furniture_in_room_polygons.append(Polygon(coords))
@@ -48,14 +48,12 @@ def solve(count, version, room, furniture):
     return furniture_in_room
 
 # Parameters:
-#   room: [coordinates]
 #   room_polygon: Polygon
 #   furniture_in_room_polygons: [Polygon]
 #   f: [coordinates]
 # Returns None or [coordinates]
-def fits_in_room(room, room_polygon, furniture_in_room_polygons, f):
-    xs, ys = zip(*room)
-    for i in transformations(f, min(xs), max(xs), min(ys), max(ys)):
+def fits_in_room(room_polygon, furniture_in_room_polygons, f):
+    for i in transformations(f, room_polygon.bounds[0], room_polygon.bounds[2], room_polygon.bounds[1], room_polygon.bounds[3]):
         for j in rotations(i):
             if check_with_coords(room_polygon, furniture_in_room_polygons, j):
                 return j
