@@ -12,16 +12,35 @@ import sys
 #   (coverage, resulting_cost)
 #       where coverage: double
 #             resulting_cost: double
+# Or returns None
 def go(input_file, output_file, number):
+    result = go_with_string(input_file, output_file, number)
+    if not result:
+        return None
+    return (result[0], result[1])
+
+# Parameters:
+#   input_file: string
+#   output_file: string
+#   number: integer
+# Returns:
+#   (coverage, resulting_cost, string)
+#       where coverage: double
+#             resulting_cost: double
+# Or returns None
+def go_with_string(input_file, output_file, number):
     problem_info = {}
     for i in [input_file, output_file]:
         with open(i, "r") as in_file:
             for problem in in_file:
                 if problem.split(":")[0].isdigit():
                     if int(problem.split(":")[0]) == number:
+                        string = problem
                         problem_info[i] = problem
                         break
-    return calculate(parser.divide_problem(problem_info[input_file]), parser.parse_result(problem_info[output_file]))
+    if len(problem_info) != 2:
+        return None
+    return calculate(parser.divide_problem(problem_info[input_file]), parser.parse_result(problem_info[output_file])) + (string,)
 
 # Parameters:
 #   original_problem: (room, furniture)
