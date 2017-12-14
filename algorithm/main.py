@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 import parser
-import algorithm_old as algorithm
-#import algorithm
+#import algorithm_old as algorithm
+import algorithm
 import coverage_calculator
 import time
 import sys
