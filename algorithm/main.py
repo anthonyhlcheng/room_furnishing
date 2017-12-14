@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
 import parser
-import algorithm
+#import algorithm_old as algorithm
+impoort algorithm
 import coverage_calculator
 import time
 import sys
@@ -21,6 +22,7 @@ def start(input_file, output_file, version):
                 resulting_string = algorithm.solve_problem(counter, version, problem)
                 if not resulting_string.replace(" ", ""):
                     print("Problem {} not completed due to no result found".format(counter))
+                    counter += 1
                     continue
                 output.write("{}: {}\n".format(counter, resulting_string))
             problem_coverage_results = coverage_calculator.go(input_file, output_file, counter)
@@ -33,6 +35,7 @@ def start(input_file, output_file, version):
             counter += 1
 
 if __name__ == "__main__":
+    start(sys.argv[1], sys.argv[2].format(sys.argv[3]), sys.argv[3])
     try:
         start(sys.argv[1], sys.argv[2].format(sys.argv[3]), sys.argv[3])
     except Exception as e:
