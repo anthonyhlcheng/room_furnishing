@@ -160,8 +160,8 @@ def rotations(f, rotation_point):
     
     for i in iterator:
         theta = 0
-        step_in_degrees = 0.1
-        end = 2 * math.pi
+        step_in_degrees = 15
+        end = 180
         a,b = list(zip(*f.exterior.coords.xy))[0]
         while theta < end:
             yield rotate(f, theta, i)
