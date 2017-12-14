@@ -2,7 +2,7 @@
 
 import parser
 #import algorithm_old as algorithm
-impoort algorithm
+import algorithm
 import coverage_calculator
 import time
 import sys

@@ -49,7 +49,7 @@ def solve(count, version, room, furniture):
         print("Problem {}, {}/{}".format(count, counter, len(furniture)), end="\r")
         if type(room_polygon) is MultiPolygon or type(room_polygon) is list:
             for i in room_polygon:
-                result = fits_in_room(i, room_polygon, Polygon(f[1]))
+                result = fits_in_room(i, furniture_in_room_polygons, Polygon(f[1]))
                 if result[1]:
                     coords = result[1]
                     room_polygon = [i if i != i else result[0] for i in room_polygon]
