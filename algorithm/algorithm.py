@@ -52,7 +52,7 @@ def solve(count, version, room, furniture):
                 result = fits_in_room(i, furniture_in_room_polygons, Polygon(f[1]))
                 if result[1]:
                     coords = result[1]
-                    if result[0] is MultiPolygon:
+                    if type(result[0]) is MultiPolygon:
                         room_polygon = [j for j in room_polygon if j != i] + [i for i in result[0]]
                     else:
                         room_polygon = [j if j != i else result[0] for j in room_polygon]
