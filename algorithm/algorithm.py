@@ -3,8 +3,10 @@
 import math
 import os
 from shapely.geometry import Polygon
+from shapely.geometry import MultiPolygon
 from shapely.ops import transform
 from shapely.affinity import rotate
+from shapely.errors import PredicateError
 from matplotlib import pyplot
 
 PLOT_EACH_PROBLEM = False
@@ -14,7 +16,8 @@ VISUALISATION_FILENAME = "{}.jpg"
 
 USE_SNAPPING_TECHNIQUE = True
 STEP_MULTIPLIER_PERCENTAGE = 5
-USE_SCAN_TECHNIQUE = True
+USE_SCAN_TECHNIQUE = False
+USE_TWO_CORNER_OPTIMISER = False
 
 # Parameters:
 #   counter: integer
@@ -43,17 +46,22 @@ def solve(count, version, room, furniture):
     room_polygon = Polygon(room)
     counter = 1
     for f in furniture:
+        coords = None
         print("Problem {}, {}/{}".format(count, counter, len(furniture)), end="\r")
-        if type(room_polygon) is Polygon:
-            room_polygon,coords = fits_in_room(room_polygon, furniture_in_room_polygons, Polygon(f[1]))
-        else:
+        if type(room_polygon) is MultiPolygon or type(room_polygon) is list:
             for i in room_polygon:
                 result = fits_in_room(i, furniture_in_room_polygons, Polygon(f[1]))
                 if result[1]:
-                    room_polygon,coords = result
+                    coords = result[1]
+                    if type(result[0]) is MultiPolygon:
+                        room_polygon = [j for j in room_polygon if j != i] + [i for i in result[0]]
+                    else:
+                        room_polygon = [j if j != i else result[0] for j in room_polygon]
                     break
+        else:
+            room_polygon,coords = fits_in_room(room_polygon, furniture_in_room_polygons, Polygon(f[1]))
         if coords:
-            furniture_in_room.append(list(zip(*coords.exterior.xy)))
+            furniture_in_room.append(list(zip(*coords.exterior.xy))[:-1])
             furniture_in_room_polygons.append(coords)
         counter += 1
     if PLOT_EACH_PROBLEM or SAVE_PROBLEM:
@@ -81,7 +89,16 @@ def fits_in_room(room_polygon, furniture_in_room_polygons, f):
 # Returns:
 #   Polygon
 def new_room_polygon(room_polygon, f):
-    return room_polygon.difference(f)
+    if USE_SNAPPING_TECHNIQUE:
+        difference_polygon = room_polygon.difference(f)
+        i = 0.01
+        step = 0.01
+        while difference_polygon.intersects(f):
+            difference_polygon = room_polygon.difference(f.buffer(i, cap_style=2))
+            i += step
+        return difference_polygon
+    else:
+        return room_polygon
 
 # Parameters:
 #   room: Polygon
@@ -90,9 +107,10 @@ def new_room_polygon(room_polygon, f):
 # Returns True or False
 def check_with_coords(room, furniture_in_room, f):
     if is_inside(room, f):
-        for room_f in furniture_in_room:
-            if not no_overlap(room_f, f):
-                return False
+        if USE_SCAN_TECHNIQUE:
+            for room_f in furniture_in_room:
+                if not no_overlap(room_f, f):
+                    return False
         return True
     return False
 
@@ -101,8 +119,28 @@ def check_with_coords(room, furniture_in_room, f):
 #   f: Polygon
 # Returns True or False
 def is_inside(room, f):
-    return f.within(room)
+    try:
+        return f.within(room)
+    except Exception:
+        return False
 
+# Parameters:
+#   coordinates: [coordinate]
+#       where:
+#           coordinate: (double, double)
+# Returns:
+#   [(double, double), (double, double)]
+def get_best_two_corners(coordinates):
+    if not USE_TWO_CORNER_OPTIMISER:
+        return coordinates
+    results = (0, [])
+    for i in range(len(coordinates) - 1):
+        for j in range(i + 1, len(coordinates)):
+            distance = math.sqrt((coordinates[j][0] - coordinates[i][0]) ** 2 + (coordinates[j][1] - coordinates[i][1]) ** 2)
+            if distance > results[0]:
+                results = (distance, [coordinates[i], coordinates[j]])
+    return results[1]
+ 
 # Parameters:
 #   f: Polygon
 #   min_x: double
@@ -113,8 +151,9 @@ def is_inside(room, f):
 # Returns Polygon
 def transformations(f, min_x, max_x, min_y, max_y, room_polygon):
     if USE_SNAPPING_TECHNIQUE:
+        corners = get_best_two_corners(list(zip(*f.exterior.coords.xy)))
         for i in list(zip(*room_polygon.exterior.coords.xy)):
-            for j in list(zip(*f.exterior.coords.xy)):
+            for j in corners:
                 yield (transform(lambda x,y: (x + i[0] - j[0], y + i[1] - j[1]), f), i)
     
     if USE_SCAN_TECHNIQUE:
@@ -140,8 +179,8 @@ def rotations(f, rotation_point):
     
     for i in iterator:
         theta = 0
-        step_in_degrees = 0.1
-        end = 2 * math.pi
+        step_in_degrees = 15
+        end = 180
         a,b = list(zip(*f.exterior.coords.xy))[0]
         while theta < end:
             yield rotate(f, theta, i)
