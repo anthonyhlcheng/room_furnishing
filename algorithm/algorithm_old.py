@@ -42,8 +42,8 @@ def solve(count, version, room, furniture):
         print("Problem {}, {}/{}".format(count, counter, len(furniture)), end="\r")
         coords = fits_in_room(room_polygon, furniture_in_room_polygons, Polygon(f[1]))
         if coords:
-            furniture_in_room.append(coords)
-            furniture_in_room_polygons.append(Polygon(coords))
+            furniture_in_room.append(list(zip(*coords.exterior.xy))[:-1])
+            furniture_in_room_polygons.append(coords)
         counter += 1
     if PLOT_EACH_PROBLEM or SAVE_PROBLEM:
         plot(count, version, room, [room_polygon] + furniture_in_room_polygons)
@@ -90,7 +90,7 @@ def is_inside(room, f):
 # Returns Polygon
 def transformations(f, min_x, max_x, min_y, max_y):
     largest = max_x - min_x if max_x - min_x >= max_y - min_y else max_y - min_y
-    step = 0.03 * largest
+    step = 0.01 * largest
     i = min_x
     while i < max_x:
         j = min_y
@@ -104,8 +104,8 @@ def transformations(f, min_x, max_x, min_y, max_y):
 # Returns Polygon
 def rotations(f):
     theta = 0
-    step_in_degrees = 1
-    end = 2 * math.pi
+    step_in_degrees = 15
+    end = 180
     while theta < end:
         yield rotate(f, theta, "centroid")
         theta += step_in_degrees
