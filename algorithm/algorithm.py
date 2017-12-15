@@ -17,7 +17,9 @@ VISUALISATION_FILENAME = "{}.jpg"
 USE_SNAPPING_TECHNIQUE = True
 STEP_MULTIPLIER_PERCENTAGE = 5
 USE_SCAN_TECHNIQUE = False
-USE_TWO_CORNER_OPTIMISER = False
+USE_TWO_CORNER_OPTIMISER = True
+ROTATION_DISTANCE = 180
+ORDER_BY_SCORE =  True # False for order by unit cost
 
 # Parameters:
 #   counter: integer
@@ -40,7 +42,10 @@ def solve_problem(counter, version, problem):
 #             coordinates: (double, double)
 # Returns [[coordinates]]
 def solve(count, version, room, furniture):
-    furniture.sort(key=lambda x: x[0] * Polygon(x[1]).area, reverse=True)
+    if ORDER_BY_SCORE:
+        furniture.sort(key=lambda x: x[0] * Polygon(x[1]).area, reverse=True)
+    else:
+        furniture.sort(key=lambda x: x[0], reverse=True)
     furniture_in_room = []
     furniture_in_room_polygons = []
     room_polygon = Polygon(room)
@@ -180,7 +185,7 @@ def rotations(f, rotation_point):
     for i in iterator:
         theta = 0
         step_in_degrees = 15
-        end = 180
+        end = ROTATION_DISTANCE
         a,b = list(zip(*f.exterior.coords.xy))[0]
         while theta < end:
             yield rotate(f, theta, i)
