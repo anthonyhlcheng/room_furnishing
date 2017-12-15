@@ -45,10 +45,42 @@ public class ShapeGenerator {
             }else{
                 path.lineTo(x * COORDINATE_SCALE,y * COORDINATE_SCALE);
             }
-
         }
         path.closePath();
         paths.add(path);
+    }
+
+    public Pair<Double, Double> calculateMaxWidthAndHeight(ArrayList<Pair<Double, Double>> coordinates) {
+        Double maxX = 0.0;
+        Double minX = Double.MAX_VALUE;
+        Double minY = Double.MAX_VALUE;
+        Double maxY = 0.0;
+        Double diffInX = 0.0;
+        Double diffInY = 0.0;
+        for(Pair<Double,Double> pair:coordinates) {
+            Double x = pair.getKey();
+            Double y = pair.getValue();
+            //get max values
+            if (x > maxX) {
+                maxX = x;
+            }
+            if (y > maxY) {
+                maxY = y;
+            }
+
+            //get min values
+            if (x < minX) {
+                minX = x;
+            }
+            if (y < minY) {
+                minY = y;
+            }
+
+            //get differences
+            diffInX = maxX - minX;
+            diffInY = maxY - minY;
+        }
+        return new Pair<>(diffInX, diffInY);
     }
 
     public void changeCoordinateScale(Double scale){

@@ -1,19 +1,17 @@
-import java.awt.EventQueue;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.util.ArrayList;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 
-    public class Display extends JFrame {
-        Display(String room, ArrayList<String> shapesInRoom) {
-            initUI(room, shapesInRoom);
+public class Display extends JFrame{
+
+        Display(String room, ArrayList<String> shapesInRoom, ArrayList<String> shapesNotInRoom) {
+            initUI(room, shapesInRoom, shapesNotInRoom);
         }
 
-        private void initUI(String room, ArrayList<String> shapesInRoom) {
-            add(new Room(room, shapesInRoom));
+        private void initUI(String room, ArrayList<String> shapesInRoom, ArrayList<String> shapesNotInRoom) {
+            add(new Room(room, shapesInRoom, shapesNotInRoom));
             setTitle("Visualiser");
-            setSize(1280, 720);
+            setSize(1920, 1080);
             setLocationRelativeTo(null);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
@@ -24,12 +22,11 @@ import javax.swing.JPanel;
 
                 @Override
                 public void run() {
-                    String filename = "src/main/java/1.txt";
+                    String filename = "C:\\Users\\zheng\\Desktop\\room_furnishing\\visualiser\\src\\main\\java\\1.txt";
                     ReadFile read = new ReadFile(filename);
-                    Display ex = new Display(read.getRoom(), read.getShapesInRoom());
-                    //Display ex = new Display("(0, 0), (10, 0), (10, 10), (0, 10)");
+                    Display ex = new Display(read.getRoom(), read.getShapesInRoom(), read.getShapesNotInRoom());
                     ex.setVisible(true);
                 }
             });
         }
-    }
+}
