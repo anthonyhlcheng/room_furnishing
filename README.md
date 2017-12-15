@@ -23,5 +23,5 @@ The Room Furnishing Problem
 - __Version 3__ - With transformation steps of 0.5
 - __Version 6__ - Made transformation step relative to room size
 - __Version 10__ - Snapping off, scanning on and 5% step
-- __Version 9__ - Snapping algorithm fixed
 - __Version 101__ - Using two corner optimiser
+- __Version 9__ - Snapping algorithm fixed
