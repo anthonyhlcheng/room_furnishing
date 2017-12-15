@@ -17,6 +17,9 @@ VISUALISATION_FILENAME = "{}.jpg"
 USE_SNAPPING_TECHNIQUE = True
 STEP_MULTIPLIER_PERCENTAGE = 5
 USE_SCAN_TECHNIQUE = False
+USE_TWO_CORNER_OPTIMISER = True
+ROTATION_DISTANCE = 180
+ORDER_BY_SCORE = False # True # False for order by unit cost
 
 # Parameters:
 #   counter: integer
@@ -39,7 +42,10 @@ def solve_problem(counter, version, problem):
 #             coordinates: (double, double)
 # Returns [[coordinates]]
 def solve(count, version, room, furniture):
-    furniture.sort(key=lambda x: x[0] * Polygon(x[1]).area, reverse=True)
+    if ORDER_BY_SCORE:
+        furniture.sort(key=lambda x: x[0] * Polygon(x[1]).area, reverse=True)
+    else:
+        furniture.sort(key=lambda x: x[0], reverse=True)
     furniture_in_room = []
     furniture_in_room_polygons = []
     room_polygon = Polygon(room)
@@ -120,8 +126,25 @@ def check_with_coords(room, furniture_in_room, f):
 def is_inside(room, f):
     try:
         return f.within(room)
-    except PredicateError:
+    except Exception:
         return False
+
+# Parameters:
+#   coordinates: [coordinate]
+#       where:
+#           coordinate: (double, double)
+# Returns:
+#   [(double, double), (double, double)]
+def get_best_two_corners(coordinates):
+    if not USE_TWO_CORNER_OPTIMISER:
+        return coordinates
+    results = (0, [])
+    for i in range(len(coordinates) - 1):
+        for j in range(i + 1, len(coordinates)):
+            distance = math.sqrt((coordinates[j][0] - coordinates[i][0]) ** 2 + (coordinates[j][1] - coordinates[i][1]) ** 2)
+            if distance > results[0]:
+                results = (distance, [coordinates[i], coordinates[j]])
+    return results[1]
  
 # Parameters:
 #   f: Polygon
@@ -133,8 +156,9 @@ def is_inside(room, f):
 # Returns Polygon
 def transformations(f, min_x, max_x, min_y, max_y, room_polygon):
     if USE_SNAPPING_TECHNIQUE:
+        corners = get_best_two_corners(list(zip(*f.exterior.coords.xy)))
         for i in list(zip(*room_polygon.exterior.coords.xy)):
-            for j in list(zip(*f.exterior.coords.xy)):
+            for j in corners:
                 yield (transform(lambda x,y: (x + i[0] - j[0], y + i[1] - j[1]), f), i)
     
     if USE_SCAN_TECHNIQUE:
@@ -161,7 +185,7 @@ def rotations(f, rotation_point):
     for i in iterator:
         theta = 0
         step_in_degrees = 15
-        end = 180
+        end = ROTATION_DISTANCE
         a,b = list(zip(*f.exterior.coords.xy))[0]
         while theta < end:
             yield rotate(f, theta, i)
