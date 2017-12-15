@@ -69,4 +69,4 @@ if __name__ == "__main__":
         print(go(sys.argv[1], sys.argv[2], int(sys.argv[3])))
     except Exception as e:
         print(e)
-        print("Usage: {} [problem filename] [output filename] [problem number]")
+        print("Usage: {} [problem filename] [output filename] [problem number]".format(sys.argv[0]))

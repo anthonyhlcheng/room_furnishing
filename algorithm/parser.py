@@ -19,7 +19,6 @@ def divide_problem(problem):
 def parse_result(problem):
     return [[tuple(map(float, j.replace(" ", "").strip("()").split(","))) for j in i.split("),")] for i in problem.split(":")[1].strip().split("; ")]
 
-
 # Returns list:
 # [(room, temperature)]
 def main(input_file):
