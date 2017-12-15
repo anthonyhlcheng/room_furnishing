@@ -26,8 +26,11 @@ def start(input_file, output_file, version):
                     continue
                 output.write("{}: {}\n".format(counter, resulting_string))
             problem_coverage_results = coverage_calculator.go(input_file, output_file, counter)
-            result = "32mPASSED" if problem_coverage_results[0] >= 30 else "31mFAILED"
-            print("\033[{}\033[0m Problem {}: Coverage: {}%, Score: {} - {} seconds".format(result, counter, problem_coverage_results[0], problem_coverage_results[1], round(time.time() - start_time, 2)))
+            if problem_coverage_results:
+                result = "32mPASSED" if problem_coverage_results[0] >= 30 else "31mFAILED"
+                print("\033[{}\033[0m Problem {}: Coverage: {}%, Score: {} - {} seconds".format(result, counter, problem_coverage_results[0], problem_coverage_results[1], round(time.time() - start_time, 2)))
+            else: 
+                print("\033[91mERROR\033[0m Problem {} - {} seconds".format(counter, round(time.time() - start_time, 2)))
             counter += 1
         except KeyboardInterrupt:
             print("Problem {} not completed due to Keyboard Interrupt".format(counter))
