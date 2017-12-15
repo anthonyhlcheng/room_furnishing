@@ -7,6 +7,8 @@ problems_file = os.path.join(os.path.dirname(__file__), "../problems.rfp")
 directory_path = os.path.join(os.path.dirname(__file__), "../outputs/")
 output_file = directory_path + "output_best.txt"
 
+input_file_for_problem = ["" for i in range(30)]
+
 def write_best_answers():
     best_results = {}
     # best_results format:
@@ -20,6 +22,7 @@ def write_best_answers():
                 if result[0] >= 30:
                     if str(i) not in best_results or result[1] > best_results[str(i)][0]:
                         best_results[str(i)] = (result[1], result[2])
+                        input_file_for_problem[i-1] = answer_file
     with open(output_file, "w") as output:
         output.write("zaragoza\n")
         output.write("t2ri0va94ush0tdu9gpuusq64r\n")
@@ -34,7 +37,7 @@ def show_status():
         status = "32mPASSED" if result and result[0] >= 30 else "31mFAILED"
         if result:
             passed += 1
-            print("\033[{}\033[0m Problem {} - Coverage: {}%, Score: {}".format(status, i, result[0], result[1]))
+            print("\033[{}\033[0m Problem {} - Coverage: {}%, Score: {} => {}".format(status, i, result[0], result[1], input_file_for_problem[i-1]))
         else:
             print("\033[{}\033[0m Problem {} - No result".format(status, i))
     print("Number of passed problems: {}".format(passed))

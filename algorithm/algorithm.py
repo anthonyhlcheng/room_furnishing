@@ -19,7 +19,7 @@ STEP_MULTIPLIER_PERCENTAGE = 5
 USE_SCAN_TECHNIQUE = False
 USE_TWO_CORNER_OPTIMISER = True
 ROTATION_DISTANCE = 180
-ORDER_BY_SCORE = False # True # False for order by unit cost
+ORDER_BY_SCORE =  True # False for order by unit cost
 
 # Parameters:
 #   counter: integer
