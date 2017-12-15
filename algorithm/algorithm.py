@@ -20,6 +20,7 @@ USE_SCAN_TECHNIQUE = False
 USE_TWO_CORNER_OPTIMISER = True
 ROTATION_DISTANCE = 180
 ORDER_BY_SCORE =  True # False for order by unit cost
+EXIT_WITH_COVERAGE = 40 # Set 100 for best score
 
 # Parameters:
 #   counter: integer
@@ -50,9 +51,14 @@ def solve(count, version, room, furniture):
     furniture_in_room_polygons = []
     room_polygon = Polygon(room)
     counter = 1
+    current_area = 0
+    original_area = room_polygon.area
     for f in furniture:
+        coverage = 100 * current_area / original_area
+        if coverage > EXIT_WITH_COVERAGE:
+            break
         coords = None
-        print("Problem {}, {}/{}".format(count, counter, len(furniture)), end="\r")
+        print("Problem {}, {}/{}: Coverage is ".format(count, counter, len(furniture)), coverage, end="\r")
         if type(room_polygon) is MultiPolygon or type(room_polygon) is list:
             for i in room_polygon:
                 result = fits_in_room(i, furniture_in_room_polygons, Polygon(f[1]))
@@ -68,6 +74,7 @@ def solve(count, version, room, furniture):
         if coords:
             furniture_in_room.append(list(zip(*coords.exterior.xy))[:-1])
             furniture_in_room_polygons.append(coords)
+            current_area += Polygon(coords).area
         counter += 1
     if PLOT_EACH_PROBLEM or SAVE_PROBLEM:
         plot(count, version, room, [Polygon(room)] + furniture_in_room_polygons)
