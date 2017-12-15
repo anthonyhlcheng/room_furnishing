@@ -20,7 +20,7 @@ USE_SCAN_TECHNIQUE = False
 USE_TWO_CORNER_OPTIMISER = True
 ROTATION_DISTANCE = 180
 ORDER_BY_SCORE =  True # False for order by unit cost
-EXIT_WITH_COVERAGE = 60 # Set 100 for best score
+EXIT_WITH_COVERAGE = 42 # Set 100 for best score
 
 # Parameters:
 #   counter: integer

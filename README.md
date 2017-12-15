@@ -29,3 +29,6 @@ The Room Furnishing Problem
 - __Version 104__ - Using two corner optimiser and order by score
 - __Version 1002__ - Running for 40% coverage
 - __Version 1101__ - Running for 40% coverage
+- __Version 2000__ - Running with sorting by area
+- __Version 1106__ - Running with 60% coverage
+- __Version 3000__ - Running 22 with 42% coverage
